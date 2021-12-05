@@ -9,6 +9,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
+    public function index(Request $request): Response
+    {
+        return \response(User::all());
+    }
+
     public function register(Request $request)
     {
         $fields = $request->validate([

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePoemsTable extends Migration
+class CreateCommentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreatePoemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('poems', function (Blueprint $table) {
+        Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->unique();
-            $table->string('slug')->unique();
-            $table->text('description');
-            $table->integer('user_id')->unique();
+            $table->string('message');
+            $table->string('user_id')->unique();
+            $table->string('poem_id')->unique();
             $table->timestamps();
         });
     }
@@ -30,6 +29,6 @@ class CreatePoemsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('poems');
+        Schema::dropIfExists('comments');
     }
 }

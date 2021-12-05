@@ -27,7 +27,9 @@ class PoemController extends Controller
      */
     public function store(Request $request): Response
     {
-        $request->validate(['title' => 'required', 'slug' => 'required', 'description' => 'required']);
+        $request->validate(['title' => 'required|string|unique:poems',
+            'slug' => 'required|string|unique:poems',
+            'description' => 'required|string']);
         $poem = Poem::create($request->all());
         return response(['message' => 'Poem created successfully', 'poem' => $poem], ResponseAlias::HTTP_CREATED);
     }
@@ -40,7 +42,9 @@ class PoemController extends Controller
      */
     public function show($id): Response
     {
-        return response(Poem::find($id));
+        $poem = Poem::find($id);
+        $comments = $poem->comments;
+        return response(['poem' => $poem]);
     }
 
     /**
@@ -70,12 +74,23 @@ class PoemController extends Controller
 
     /**
      * Search a specified resource from storage.
+     * by title, slug or phrase in poem body
      *
-     * @param string $title
+     * @param Request $request
      * @return Response
      */
-    public function search(string $title): Response
+    public function search(Request $request): Response
     {
-        return \response(Poem::where('title', 'like', '%' . $title . '%')->get());
+        $searchTerm = $request->input('searchTerm');
+
+        if (isset($searchTerm)) {
+            $found = Poem::where('title', 'like', '%' . $searchTerm . '%')
+                ->orWhere('slug', 'like', '%' . $searchTerm . '%')
+                ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                ->get();
+            return response($found);
+        }
+
+        return response(['message' => 'Missing search term'], ResponseAlias::HTTP_NOT_FOUND);
     }
 }

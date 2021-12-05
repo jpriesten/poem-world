@@ -5,16 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @mixin IdeHelperPoem
+ * @mixin IdeHelperComment
  */
-class Poem extends Model
+class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'description', 'user_id'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var string[]
+     */
+    protected $fillable = [
+        'user_id',
+        'poem_id',
+        'message',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -23,10 +31,11 @@ class Poem extends Model
      */
     protected $hidden = [
         'user_id',
+        'poem_id'
     ];
 
     /**
-     * Get the poem that owns the comment.
+     * Get the user that made the comment.
      */
     public function user(): BelongsTo
     {
@@ -34,18 +43,10 @@ class Poem extends Model
     }
 
     /**
-     * Get the comments associated with the poem.
+     * Get the poem that owns the comment.
      */
-    public function comments(): HasMany
+    public function poem(): BelongsTo
     {
-        return $this->hasMany(Comment::class);
-    }
-
-    /**
-     * Get the likes associated with the poem.
-     */
-    public function likes(): HasMany
-    {
-        return $this->hasMany(Like::class);
+        return $this->belongsTo(Poem::class);
     }
 }
