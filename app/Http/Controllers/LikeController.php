@@ -4,61 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Models\Like;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as ResponseCodes;
+use Throwable;
 
 class LikeController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index()
+    public function index(): Response
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return response(Like::all());
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function show(Like $like)
+    public function show(int $id): Response
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Like $like)
-    {
-        //
+        $like = Like::find($id);
+        return response($like);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Like  $like
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function destroy(Like $like)
+    public function destroy(int $id): Response
     {
-        //
+        return response(Like::destroy($id));
     }
 }

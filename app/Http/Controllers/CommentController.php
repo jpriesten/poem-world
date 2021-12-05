@@ -26,8 +26,8 @@ class CommentController extends Controller
      */
     public function store(Request $request): Response
     {
-        $request->validate(['user_id' => 'required',
-            'poem_id' => 'required',
+        $request->validate(['user_id' => 'required|integer',
+            'poem_id' => 'required|integer',
             'message' => 'required|string']);
 
         $comment = Comment::create($request->all());
@@ -37,10 +37,10 @@ class CommentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Comment $comment
-     * @return \Illuminate\Http\Response
+     * @param Comment $comment
+     * @return Response
      */
-    public function show(Comment $comment)
+    public function show(Comment $comment): Response
     {
         return response(Comment::find($comment));
     }
@@ -48,23 +48,31 @@ class CommentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Comment $comment
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, int $id): Response
     {
-        //
+        $request->validate(['message' => 'required|string']);
+
+        $comment = Comment::find($id);
+        if ($comment !== null) {
+            $comment->update(['message' => $request->input('message')]);
+            return response($comment);
+        }
+
+        return response(['message' => 'Comment does not exist']);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Comment $comment
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function destroy(Comment $comment)
+    public function destroy(int $id): Response
     {
-        //
+        return response(Comment::destroy($id));
     }
 }

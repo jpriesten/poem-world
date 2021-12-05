@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Like;
 use App\Models\Poem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class PoemController extends Controller
@@ -40,11 +43,76 @@ class PoemController extends Controller
      * @param int $id
      * @return Response
      */
-    public function show($id): Response
+    public function show(int $id): Response
     {
         $poem = Poem::find($id);
-        $comments = $poem->comments;
-        return response(['poem' => $poem]);
+        if ($poem !== null) {
+            return response(['poem' => $poem]);
+        }
+
+        return response(['message' => "Poem not found"]);
+    }
+
+    /**
+     * Upvote a poem
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function like(Request $request): Response
+    {
+        $userId = Auth::id();
+        $request->validate(['poem_id' => 'required|integer']);
+
+        $foundLike = Like::whereUserId($userId)->where('poem_id', '=', $request->input('poem_id'))
+            ->where('type', '=', 'LIKE')
+            ->first();
+        $poem = Poem::whereId($request->input('poem_id'))->firstOrFail();
+
+        DB::transaction(function () use ($poem, $userId, $foundLike) {
+            if ($foundLike === null) {
+                $poem->likes++;
+                $poem->save();
+                Like::create(['user_id' => $userId, 'poem_id' => $poem->id, 'type' => 'LIKE']);
+            } else {
+                $poem->likes--;
+                $poem->save();
+                Like::destroy($foundLike->id);
+            }
+        });
+
+        return response($poem);
+    }
+
+    /**
+     * Down vote a poem
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function disLike(Request $request): Response
+    {
+        $userId = Auth::id();
+        $request->validate(['poem_id' => 'required|integer']);
+
+        $foundLike = Like::whereUserId($userId)->where('poem_id', '=', $request->input('poem_id'))
+            ->where('type', '=', 'DISLIKE')
+            ->first();
+        $poem = Poem::whereId($request->input('poem_id'))->firstOrFail();
+
+        DB::transaction(function () use ($poem, $userId, $foundLike) {
+            if ($foundLike === null) {
+                $poem->dislikes++;
+                $poem->save();
+                Like::create(['user_id' => $userId, 'poem_id' => $poem->id, 'type' => 'DISLIKE']);
+            } else {
+                $poem->dislikes--;
+                $poem->save();
+                Like::destroy($foundLike->id);
+            }
+        });
+
+        return response($poem);
     }
 
     /**
@@ -69,7 +137,7 @@ class PoemController extends Controller
      */
     public function destroy(int $id): Response
     {
-        return \response(Poem::destroy($id));
+        return response(Poem::destroy($id));
     }
 
     /**

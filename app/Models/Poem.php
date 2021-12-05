@@ -14,7 +14,7 @@ class Poem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'slug', 'description', 'user_id'];
+    protected $fillable = ['title', 'slug', 'description', 'user_id', 'likes', 'dislikes'];
 
     /**
      * The attributes that should be hidden for serialization.

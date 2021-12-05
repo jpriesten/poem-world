@@ -19,6 +19,8 @@ class CreatePoemsTable extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->integer('user_id')->unique();
+            $table->integer('likes')->default(0);
+            $table->integer('dislikes')->default(0);
             $table->timestamps();
         });
     }
