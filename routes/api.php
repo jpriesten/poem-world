@@ -33,7 +33,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
 //    Poems routes
-    Route::post('poems', [PoemController::class, 'store']);
+    Route::post('poem', [PoemController::class, 'store']);
     Route::put('poems/{id}', [PoemController::class, 'update']);
     Route::delete('poems/{id}', [PoemController::class, 'destroy']);
 });
